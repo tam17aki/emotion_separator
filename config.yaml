@@ -1,0 +1,72 @@
+xvector:
+  root_dir: "/home/tamamori/work/n-hon-knock/SpeakerRecognition/"
+  data_dir: "voice-statistics/data/"
+  feat_dir: "feats/"
+  model_dir: "model/"
+  corpus_url: "https://github.com/voice-statistics/voice-statistics.github.com/raw/master/assets/data/"
+  repo_url: "https://github.com/sarulab-speech/xvector_jtubespeech/archive/refs/heads/master.zip"
+  repo_name: "xvector_jtubespeech-master"
+  n_jobs: 2
+
+actor:
+  - "tsuchiya"
+  - "fujitou"
+  - "uemura"
+
+emotion:
+  - "angry"
+  - "happy"
+  - "normal"
+
+feature:
+  sample_rate: 16000
+  num_ceps: 24
+  num_melbins: 24
+
+pretrained:
+  repo_name: "xvector_jtubespeech-master"
+  file_name: "xvector.pth"
+
+model:
+  encoder_spk:
+    input_dim: 512
+    hidden_dim: 256
+    latent_dim: 256
+    n_layers: 3
+  encoder_emo:
+    input_dim: 512
+    hidden_dim: 256
+    latent_dim: 256
+    n_layers: 3
+  classifier_aux:
+    hidden_dim: 512
+    n_layers: 3
+  decoder:
+    input_dim: 512
+    hidden_dim: 512
+    n_layers: 3
+
+training:
+  seed: 0
+  test_size: 0.2
+  n_epoch: 500
+  n_batch: 16
+  adv_weight: 10.0
+  ce_loss_adv: False  # 感情分類の交差エントロピーを敵対的損失に使うかどうか (True: 使う)
+  model_file: "model.pth"
+  optim:
+    optimizer:  # 最適化アルゴリズム
+      name: Adam
+      params:  # 最適化アルゴリズムに応じて項目を追加したり減らしたりする
+        lr: 1e-3  # 学習率
+        betas: [0.9, 0.99]
+        eps: 1e-08
+        weight_decay: 0
+    lr_scheduler:  # 学習率調整アルゴリズム
+      name: MultiStepLR
+      params:  # 学習率調整アルゴリズムに応じて項目を追加したり減らしたりする
+        milestones:
+          - 300
+          - 400
+        gamma: 0.6
+  use_scheduler: False  # 学習率スケジューリングを使うか否か
