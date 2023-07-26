@@ -29,7 +29,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-class MyDataset(torch.utils.data.Dataset):
+class XvectorDataset(torch.utils.data.Dataset):
     """Dataset."""
 
     def __init__(self, feats, labels):
@@ -81,13 +81,13 @@ def get_dataloader(cfg, feats, labels):
         x_train_std = scaler.fit_transform(x_train)
         x_test_std = scaler.transform(x_test)
         train_dataloader = torch.utils.data.DataLoader(
-            dataset=MyDataset(x_train_std, y_train),
+            dataset=XvectorDataset(x_train_std, y_train),
             batch_size=cfg.training.n_batch,
             shuffle=True,
             drop_last=True,
         )
         test_dataloader = torch.utils.data.DataLoader(
-            dataset=MyDataset(x_test_std, y_test),
+            dataset=XvectorDataset(x_test_std, y_test),
             batch_size=cfg.training.n_batch,
             shuffle=False,
             drop_last=False,
@@ -96,7 +96,7 @@ def get_dataloader(cfg, feats, labels):
         scaler = StandardScaler()
         x_train_std = scaler.fit_transform(feats)
         train_dataloader = torch.utils.data.DataLoader(
-            dataset=MyDataset(x_train_std, labels),
+            dataset=XvectorDataset(x_train_std, labels),
             batch_size=cfg.training.n_batch,
             shuffle=True,
             drop_last=True,
@@ -122,7 +122,7 @@ def get_dataloader_inference(cfg, feats, labels):
     scaler = joblib.load(os.path.join(stats_dir, cfg.training.scaler_file))
     feats_std = scaler.transform(feats)
     dataloader = torch.utils.data.DataLoader(
-        dataset=MyDataset(feats_std, labels),
+        dataset=XvectorDataset(feats_std, labels),
         batch_size=cfg.inference.n_batch,
         shuffle=False,
         drop_last=False,
