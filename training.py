@@ -28,7 +28,7 @@ from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 
 from dataset import get_dataloader
-from factory import get_loss, get_lr_scheduler, get_optimizer
+from factory import get_custom_loss, get_lr_scheduler, get_optimizer
 from model import get_model
 from utils import (init_loss_stats, init_manual_seed, load_feats,
                    print_loss_acc, save_checkpoint, update_loss_stats)
@@ -95,7 +95,7 @@ def main(cfg: DictConfig):
     feats, labels = load_feats(cfg)
     dataloader = get_dataloader(cfg, feats, labels)
     model = get_model(cfg, device)
-    loss_func = get_loss(cfg, model)
+    loss_func = get_custom_loss(cfg, model)
     optimizer = get_optimizer(cfg, model)
     lr_scheduler = None
     if cfg.training.use_scheduler:
