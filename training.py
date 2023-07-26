@@ -112,10 +112,11 @@ def main(cfg: DictConfig):
     for epoch in range(1, cfg.training.n_epoch + 1):
         print(f"Epoch {epoch:2d}: ", end="")
         training_epoch(modules, device)
-        validation_step(modules, device)
+        if cfg.training.test_size != 0.0:
+            validation_step(modules, device)
 
     # save parameters
-    save_checkpoint(cfg, modules)
+    save_checkpoint(cfg, model)
 
 
 if __name__ == "__main__":
