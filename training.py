@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import os
 from collections import namedtuple
 
 import torch
@@ -31,7 +32,7 @@ from dataset import get_dataloader
 from factory import get_custom_loss, get_lr_scheduler, get_optimizer
 from model import get_model
 from utils import (init_loss_stats, init_manual_seed, load_feats,
-                   print_loss_acc, save_checkpoint, update_loss_stats)
+                   print_loss_acc, update_loss_stats)
 
 
 def training_epoch(modules, device):
@@ -83,6 +84,14 @@ def validation_step(modules, device):
             update_loss_stats(loss_stats, loss, logits, label)
     n_batch = len(modules.dataloader["test"])
     print_loss_acc(loss_stats, n_batch, is_train=False)
+
+
+def save_checkpoint(cfg: DictConfig, model):
+    """Save checkpoint."""
+    model_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.model_dir)
+    os.makedirs(model_dir, exist_ok=True)
+    model_file = os.path.join(model_dir, cfg.training.model_file)
+    torch.save(model.state_dict(), model_file)
 
 
 def main(cfg: DictConfig):
