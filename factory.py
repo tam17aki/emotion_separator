@@ -110,7 +110,7 @@ class CustomLoss(nn.Module):
         return loss_dict, logits_dict
 
 
-def get_loss(cfg: DictConfig, model):
+def get_custom_loss(cfg: DictConfig, model):
     """Instantiate customized loss."""
     custom_loss = CustomLoss(cfg, model)
     return custom_loss
