@@ -118,19 +118,3 @@ def print_loss_acc(var, n_batch: int, is_train: bool):
     )
     acc = 100 * float(var["correct_adv"] / var["total_adv"])
     print(f" (adv): {acc:.6f}% ({var['correct_adv']}/{var['total_adv']})")
-
-
-def save_checkpoint(cfg: DictConfig, model):
-    """Save checkpoint."""
-    model_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.model_dir)
-    os.makedirs(model_dir, exist_ok=True)
-    model_file = os.path.join(model_dir, cfg.training.model_file)
-    torch.save(model.state_dict(), model_file)
-
-
-def load_checkpoint(cfg: DictConfig, model):
-    """Load checkpoint."""
-    model_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.model_dir)
-    model_file = os.path.join(model_dir, cfg.training.model_file)
-    checkpoint = torch.load(model_file)
-    model.load_state_dict(checkpoint)
