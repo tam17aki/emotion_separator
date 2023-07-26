@@ -45,7 +45,7 @@ def training_epoch(modules, device):
         modules.optimizer["main"].zero_grad()
         modules.optimizer["cls"].zero_grad()
 
-        loss, logits = modules.loss_func(data, label, modules.model)
+        loss, logits = modules.loss_func(data, label)
 
         for param in parameters["cls"]:  # freeze AuxiliaryClassifier
             param.requires_grad_(requires_grad=False)
@@ -79,7 +79,7 @@ def validation_step(modules, device):
         for data, label in modules.dataloader["test"]:
             data = data.to(device).float()
             label = label.to(device).long()
-            loss, logits = modules.loss_func(data, label, modules.model)
+            loss, logits = modules.loss_func(data, label)
             update_loss_stats(loss_stats, loss, logits, label)
     n_batch = len(modules.dataloader["test"])
     print_loss_acc(loss_stats, n_batch, is_train=False)
@@ -95,7 +95,7 @@ def main(cfg: DictConfig):
     feats, labels = load_feats(cfg)
     dataloader = get_dataloader(cfg, feats, labels)
     model = get_model(cfg, device)
-    loss_func = get_loss(cfg)
+    loss_func = get_loss(cfg, model)
     optimizer = get_optimizer(cfg, model)
     lr_scheduler = None
     if cfg.training.use_scheduler:
