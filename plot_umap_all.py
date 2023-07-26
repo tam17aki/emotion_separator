@@ -70,7 +70,7 @@ def main(cfg):
                 emotion_type.append(get_emotion_type(actor, emotion))
 
     feat_array = np.concatenate(feat_list)
-    mapper = UMAP(n_components=2, random_state=0)
+    mapper = UMAP(n_components=2, random_state=cfg.inference.seed)
     fit = mapper.fit(feat_array)
     embedding = fit.transform(feat_array)
     embedding_x = embedding[:, 0]
