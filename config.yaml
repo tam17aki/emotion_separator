@@ -1,11 +1,14 @@
 xvector:
   root_dir: "/home/tamamori/work/n-hon-knock/SpeakerRecognition/"
-  data_dir: "voice-statistics/data/"
-  feat_dir: "feats/"
+  data_dir: "voice-statistics/data/"  # 声優統計コーパスの音声データの保存場所
+  feat_dir: "feats/"  # x-vectorの保存場所
+  sep_dir: "feats_separated/"  # 変換後のx-vectorの保存場所
   model_dir: "model/"
+  stats_dir: "stats/"  # StandardScalerのオブジェクトの保存場所
+  img_dir: "image/"
   corpus_url: "https://github.com/voice-statistics/voice-statistics.github.com/raw/master/assets/data/"
   repo_url: "https://github.com/sarulab-speech/xvector_jtubespeech/archive/refs/heads/master.zip"
-  repo_name: "xvector_jtubespeech-master"
+  repo_name: "xvector_jtubespeech-master"  # x-vector抽出器が置かれているリポジトリ名
   n_jobs: 2
 
 actor:
@@ -32,14 +35,14 @@ model:
     input_dim: 512
     hidden_dim: 256
     latent_dim: 256
-    n_layers: 3
+    n_layers: 1
   encoder_emo:
     input_dim: 512
     hidden_dim: 256
     latent_dim: 256
-    n_layers: 3
+    n_layers: 1
   classifier_aux:
-    hidden_dim: 512
+    hidden_dim: 256
     n_layers: 3
   decoder:
     input_dim: 512
@@ -48,12 +51,13 @@ model:
 
 training:
   seed: 0
-  test_size: 0.2
-  n_epoch: 500
-  n_batch: 16
-  adv_weight: 10.0
+  test_size: 0.0  # 0.0: 利用可能なデータを全てモデルの訓練に用いる
+  n_epoch: 2500
+  n_batch: 32
+  adv_weight: 0.1 # 敵対的損失にかかる重み係数
   ce_loss_adv: False  # 感情分類の交差エントロピーを敵対的損失に使うかどうか (True: 使う)
   model_file: "model.pth"
+  scaler_file: "stats.pkl"  # standard scalerの保存名
   optim:
     optimizer:  # 最適化アルゴリズム
       name: Adam
@@ -66,7 +70,14 @@ training:
       name: MultiStepLR
       params:  # 学習率調整アルゴリズムに応じて項目を追加したり減らしたりする
         milestones:
-          - 300
-          - 400
+          - 500
+          - 1000
+          - 1500
+          - 2000
         gamma: 0.6
-  use_scheduler: False  # 学習率スケジューリングを使うか否か
+  use_scheduler: True  # 学習率スケジューリングを使うか否か
+
+inference:
+  seed: 0
+  n_batch: 16
+  umap_image_file: "UMAP_all.png"
