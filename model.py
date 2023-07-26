@@ -161,8 +161,8 @@ class AuxiliaryClassifier(nn.Module):
         return logits
 
 
-class EmotionComponentSplitter(nn.Module):
-    """Class EmotionComponentSplitter.
+class EmotionComponentSeparator(nn.Module):
+    """Class EmotionComponentSeparator.
 
     This class implements a functionality to split emotion components from x-vector.
     """
@@ -218,4 +218,4 @@ class EmotionComponentSplitter(nn.Module):
 
 def get_model(cfg: DictConfig, device: torch.device):
     """Instantiate network."""
-    return EmotionComponentSplitter(cfg).to(device)
+    return EmotionComponentSeparator(cfg).to(device)
