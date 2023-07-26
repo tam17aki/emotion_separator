@@ -30,7 +30,14 @@ from hydra import compose, initialize
 from omegaconf import DictConfig
 
 from model import get_model
-from utils import load_checkpoint
+
+
+def load_checkpoint(cfg: DictConfig, model):
+    """Load checkpoint."""
+    model_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.model_dir)
+    model_file = os.path.join(model_dir, cfg.training.model_file)
+    checkpoint = torch.load(model_file)
+    model.load_state_dict(checkpoint)
 
 
 def main(cfg: DictConfig):
