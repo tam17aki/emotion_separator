@@ -77,7 +77,7 @@ class CustomLoss(nn.Module):
                        - reconstruction loss (MSE)
                        - encoder loss (CE)
                        - adversarial loss (CE or MSE)
-            loss_enc:  emotion 'classification' loss
+            loss_enc:  emotion 'encoder' loss
             loss_adv:  emotion 'adversarial' loss
             loss_cls:  emotion 'classification' loss
         """
