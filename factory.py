@@ -57,13 +57,14 @@ def get_lr_scheduler(cfg: DictConfig, optimizers):
 class CustomLoss(nn.Module):
     """Custom loss."""
 
-    def __init__(self, cfg: DictConfig):
+    def __init__(self, cfg: DictConfig, model):
         """Initialize class."""
         super().__init__()
         self.cfg = cfg
+        self.model = model
         self.criterion = {"ce": nn.CrossEntropyLoss(), "mse": nn.MSELoss()}
 
-    def forward(self, inputs, labels, model):
+    def forward(self, inputs, labels):
         """Compute loss function.
 
         Args:
@@ -80,7 +81,7 @@ class CustomLoss(nn.Module):
             loss_adv:  emotion 'adversarial' loss
             loss_cls:  emotion 'classification' loss
         """
-        reconst, logits_enc, logits_aux = model.forward(inputs)
+        reconst, logits_enc, logits_aux = self.model(inputs)
 
         # compute reconstruction loss
         loss_rec = self.criterion["mse"](inputs, reconst)
@@ -109,7 +110,7 @@ class CustomLoss(nn.Module):
         return loss_dict, logits_dict
 
 
-def get_loss(cfg: DictConfig):
+def get_loss(cfg: DictConfig, model):
     """Instantiate customized loss."""
-    custom_loss = CustomLoss(cfg)
+    custom_loss = CustomLoss(cfg, model)
     return custom_loss
