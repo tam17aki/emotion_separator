@@ -210,6 +210,11 @@ class EmotionComponentSplitter(nn.Module):
         reconst = self.decoder(latent)
         return reconst, logits_enc, logits_aux
 
+    def get_speaker_latent(self, inputs):
+        """Returns latent vector of speaker component."""
+        spk_latent = self.speaker_encoder(inputs)
+        return spk_latent
+
 
 def get_model(cfg: DictConfig, device: torch.device):
     """Instantiate network."""
