@@ -70,7 +70,7 @@ def get_dataloader(cfg, feats, labels):
         train_dataloader : dataloader for training
         test_dataloader : dataloader for test
     """
-    if cfg.training.test_size != 0.0:
+    if cfg.training.test_size > 0.0:
         x_train, x_test, y_train, y_test = train_test_split(
             feats,
             labels,
