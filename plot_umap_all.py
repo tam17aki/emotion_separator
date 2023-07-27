@@ -105,7 +105,14 @@ def main(cfg):
     plt.tight_layout()
     img_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.img_dir)
     os.makedirs(img_dir, exist_ok=True)
-    img_file = os.path.join(img_dir, cfg.inference.umap_image_file)
+    img_file = os.path.join(
+        img_dir,
+        cfg.inference.umap_image_file
+        + f"_epoch{cfg.training.n_epoch}"
+        + f"_adv{cfg.training.adv_weight}"
+        + f"_cls{cfg.training.cls_weight}"
+        + cfg.inference.umap_image_ext,
+    )
     plt.savefig(img_file)
     plt.show()
 
