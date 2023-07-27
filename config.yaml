@@ -55,6 +55,7 @@ training:
   n_epoch: 2500
   n_batch: 32
   adv_weight: 0.1 # 敵対的損失にかかる重み係数
+  cls_weight: 0.1 # 補助分類器にかかる重み係数
   ce_loss_adv: False  # 感情分類の交差エントロピーを敵対的損失に使うかどうか (True: 使う)
   model_file: "model.pth"
   scaler_file: "stats.pkl"  # standard scalerの保存名
