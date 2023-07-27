@@ -104,7 +104,7 @@ class CustomLoss(nn.Module):
             "main": loss_rec + loss_enc + self.cfg.training.adv_weight * loss_adv,
             "enc": loss_enc,
             "adv": loss_adv,
-            "cls": loss_cls,
+            "cls": self.cfg.training.cls_weight * loss_cls,
         }
         logits_dict = {"enc": logits_enc, "adv": logits_aux}
         return loss_dict, logits_dict
