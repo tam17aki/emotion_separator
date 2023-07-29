@@ -21,12 +21,48 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import glob
 import os
 
 import joblib
+import numpy as np
 import torch
+from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+
+def load_feats(cfg: DictConfig):
+    """Load features and labels.
+
+    Args:
+        cfg (DictConfig): configuration of model.
+
+    Returns:
+        feats (numpy array) : xvector [3 * 3 * 100, 512]
+        labels (numpy array): emotion label [3 * 3 * 100]
+    """
+    feat_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.feat_dir)
+    feats = {}
+    labels = []
+    for actor in cfg.actor:
+        feats[actor] = []
+        for emotion in cfg.emotion:
+            feat_files = glob.glob(feat_dir + actor + f"/{actor}_{emotion}_*.npy")
+            for feat_file in feat_files:
+                xvector = np.load(feat_file)
+                xvector = np.expand_dims(xvector, axis=0)
+                feats[actor].append(xvector)
+                if emotion == "angry":
+                    labels.append(0)
+                elif emotion == "happy":
+                    labels.append(1)
+                elif emotion == "normal":
+                    labels.append(2)
+        feats[actor] = np.concatenate(feats[actor])
+    feats = np.concatenate(list(feats.values()))
+    labels = np.array(labels)
+    return feats, labels
 
 
 class XvectorDataset(torch.utils.data.Dataset):
@@ -59,17 +95,17 @@ class XvectorDataset(torch.utils.data.Dataset):
         return (feat, label)
 
 
-def get_dataloader(cfg, feats, labels):
+def get_dataloader(cfg):
     """Get Dataloaders for training and test.
 
     Args:
-        inputs (numpy array) : x-vectors
-        labels (numpy array): emotion label
+        cfg (DictConfig): configuration of model.
 
     Returns:
         train_dataloader : dataloader for training
         test_dataloader : dataloader for test
     """
+    feats, labels = load_feats(cfg)
     if cfg.training.test_size > 0.0:
         x_train, x_test, y_train, y_test = train_test_split(
             feats,
@@ -106,25 +142,3 @@ def get_dataloader(cfg, feats, labels):
     os.makedirs(stats_dir, exist_ok=True)
     joblib.dump(scaler, os.path.join(stats_dir, cfg.training.scaler_file))
     return {"train": train_dataloader, "test": test_dataloader}
-
-
-def get_dataloader_inference(cfg, feats, labels):
-    """Get Dataloaders for inference.
-
-    Args:
-        inputs (numpy array) : x-vectors
-        labels (numpy array): emotion label
-
-    Returns:
-        dataloader : dataloader for inferencef
-    """
-    stats_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.stats_dir)
-    scaler = joblib.load(os.path.join(stats_dir, cfg.training.scaler_file))
-    feats_std = scaler.transform(feats)
-    dataloader = torch.utils.data.DataLoader(
-        dataset=XvectorDataset(feats_std, labels),
-        batch_size=cfg.inference.n_batch,
-        shuffle=False,
-        drop_last=False,
-    )
-    return dataloader
