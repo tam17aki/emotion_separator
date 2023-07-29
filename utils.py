@@ -21,12 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import glob
-import os
-
-import numpy as np
 import torch
-from omegaconf import DictConfig
 
 
 def init_manual_seed(random_seed: int):
@@ -35,39 +30,6 @@ def init_manual_seed(random_seed: int):
     torch.cuda.manual_seed_all(random_seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
-
-def load_feats(cfg: DictConfig):
-    """Load features and labels.
-
-    Args:
-        cfg (DictConfig): configuration of model.
-
-    Returns:
-        feats (numpy array) : xvector [3 * 3 * 100, 512]
-        labels (numpy array): emotion label [3 * 3 * 100]
-    """
-    feat_dir = os.path.join(cfg.xvector.root_dir, cfg.xvector.feat_dir)
-    feats = {}
-    labels = []
-    for actor in cfg.actor:
-        feats[actor] = []
-        for emotion in cfg.emotion:
-            feat_files = glob.glob(feat_dir + actor + f"/{actor}_{emotion}_*.npy")
-            for feat_file in feat_files:
-                xvector = np.load(feat_file)
-                xvector = np.expand_dims(xvector, axis=0)
-                feats[actor].append(xvector)
-                if emotion == "angry":
-                    labels.append(0)
-                elif emotion == "happy":
-                    labels.append(1)
-                elif emotion == "normal":
-                    labels.append(2)
-        feats[actor] = np.concatenate(feats[actor])
-    feats = np.concatenate(list(feats.values()))
-    labels = np.array(labels)
-    return feats, labels
 
 
 def init_loss_stats():
